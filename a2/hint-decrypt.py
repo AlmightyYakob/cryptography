@@ -1,17 +1,20 @@
+from textwrap import wrap
 import rsa
 
-PUBKEY_FILE = "a2.pubkeys"
-CIPHER_FILE = "a2.cipher"
+PUBKEY_FILE = "a2-hint.pubkeys"
+CIPHER_FILE = "a2-hint.cipher"
 
 ASCII_BIT_LENGTH = 8
 
 
 def main():
     with open(PUBKEY_FILE, "r") as inFile:
-        key_length, N, e = [int(line.strip()) for line in inFile.readlines()]
+        pubkey_lines = [int(line.strip()) for line in inFile.readlines()]
 
     with open(CIPHER_FILE, "r") as inFile:
         cipher_lines = [int(line.strip()) for line in inFile.readlines()]
+
+    key_length, N, e = pubkey_lines
 
     for i, line in enumerate(cipher_lines):
         print(f"{'-'*10}{i}{'-'*10}")
