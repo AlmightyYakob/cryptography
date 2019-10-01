@@ -29,9 +29,7 @@ def main():
                     decoded.append(i)
                     break
 
-    print(mapping)
     phi = int("".join([str(x - ASCII_ZERO) for x in decoded]))
-
     if math.gcd(phi, e) == 1:
         with open("a2.phi", "w") as outFile:
             outFile.write(str(phi))
