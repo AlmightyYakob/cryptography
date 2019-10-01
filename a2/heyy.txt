@@ -1,5 +1,5 @@
 For pubkeys:
 
 <rsa-key-length>
-<pubkey>
+<n>
 <e> (from notes)

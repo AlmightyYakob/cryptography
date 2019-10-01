@@ -1,30 +1,42 @@
-from textwrap import wrap
-import rsa
+import math
 
 PUBKEY_FILE = "a2-hint.pubkeys"
 CIPHER_FILE = "a2-hint.cipher"
 
-ASCII_BIT_LENGTH = 8
+ASCII_ZERO = 48
+ASCII_NINE = 57
 
 
 def main():
     with open(PUBKEY_FILE, "r") as inFile:
-        pubkey_lines = [int(line.strip()) for line in inFile.readlines()]
+        key_length, N, e = [int(line.strip()) for line in inFile.readlines()]
 
     with open(CIPHER_FILE, "r") as inFile:
         cipher_lines = [int(line.strip()) for line in inFile.readlines()]
 
-    key_length, N, e = pubkey_lines
+    mapping = {}
+    decoded = []
 
-    for i, line in enumerate(cipher_lines):
-        print(f"{'-'*10}{i}{'-'*10}")
-        print(rsa.decrypt(line, N))
-        exit()
-        bin_message = bin(pow(line, e, N))[2:]
-        chunked_bin_message = wrap(bin_message, ASCII_BIT_LENGTH)
-        print(chr(int(chunked_bin_message[0], 2)))
-        message = "".join([int(x, 2) for x in chunked_bin_message])
-        print(message)
+    for line in cipher_lines:
+        if line in mapping:
+            decoded.append(mapping[line])
+        else:
+            for i in range(ASCII_ZERO, ASCII_NINE + 1):
+                num = pow(i, e, N)
+
+                if num == line:
+                    mapping[line] = i
+                    decoded.append(i)
+                    break
+
+    print(mapping)
+    phi = int("".join([str(x - ASCII_ZERO) for x in decoded]))
+
+    if math.gcd(phi, e) == 1:
+        with open("a2.phi", "w") as outFile:
+            outFile.write(str(phi))
+    else:
+        print("Error: gcd(phi, e) != 1 !!!")
 
 
 if __name__ == "__main__":
