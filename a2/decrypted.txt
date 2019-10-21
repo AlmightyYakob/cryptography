@@ -1,0 +1,10 @@
+For this second assignment, please implement your own
+RSA cryptosystem that can generate keys, encrypt text
+files and decrypt the encrypted text files. Please submit
+the following text of this assignment by email encrypted
+using your own RSA system. Attach with your submission the
+RSA modulus and the secret decrypting exponent so I can
+decrypt your submission. As a bonus component, experiment
+with some of the fastest integer factoring algorithms known
+in the literature to date (write a short report or play with
+some known implementations or implement it yourself).
