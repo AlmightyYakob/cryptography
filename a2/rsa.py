@@ -1,12 +1,40 @@
+from random import randint
+
+
 def is_prime(n, rounds=100):
     """Determine if a number is prime using Miller-Rabin."""
-    # n = (2^r)d + 1
-    new_n = n - 1
+    # represent n = (2^r)*d + 1
+    d = n - 1
+    r = 0
 
-    while bin(new_n)[-1] != "0":
-        new_n >> 1
+    while d % 2 == 0:
+        d >>= 1
+        r += 1
 
-    pass
+    if r == 0:
+        # n is even
+        return False
+
+    def subtest(x):
+        for _ in range(r - 1):
+            x = pow(x, 2, n)
+
+            if x == n - 1:
+                return True
+
+        return False
+
+    for _ in range(n):
+        a = randint(2, n - 2)
+        x = pow(a, d, n)
+
+        if x == 1 or x == n - 1:
+            continue
+
+        if not subtest(x):
+            return False
+
+    return True
 
 
 def choose_e_d():
@@ -17,7 +45,7 @@ def compute_n_phi():
     pass
 
 
-def generate_p_q():
+def generate_p_q(k=4096):
     pass
 
 
