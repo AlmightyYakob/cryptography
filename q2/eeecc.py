@@ -50,10 +50,21 @@ def subtract_points(p1: Tuple, p2: Tuple, q: int = MOD, a: int = A, b: int = B):
     return add_points(p1, (x, y), q, a, b)
 
 
-def multiply_point(p1: Tuple, n: int, q: int = MOD, a: int = A, b: int = B):
+def multiply_point(
+    p1: Tuple, n: int, q: int = MOD, a: int = A, b: int = B, print_out=False
+):
     x, y = p1
-    for _ in range(n - 1):
+    for i in range(n - 1):
         x, y = add_points(p1, (x, y), q, a, b)
+
+        if x is None and y is None:
+            if print_out:
+                print("POINT AT INFINITY")
+            break
+
+        if print_out:
+            print(f"POINT*{i+2} = {(x, y)}")
+
         x = x % q
         y = y % q
 
