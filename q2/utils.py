@@ -42,6 +42,8 @@ def print_pulverizer(a, b):
     for row in rows:
         print_table_row(*row, row_length)
 
+    return b, x0, y0
+
 
 def pulverizer(a, b):
     """return (g, x, y) such that a*x + b*y = g = gcd(a, b)"""
