@@ -23,16 +23,17 @@ def print_pulverizer(a, b):
     rows = []
 
     # x0, x1, y0, y1 = 0, 1, 1, 0
-    x0, x1, y0, y1 = 1, 0, 0, 1
-    while a != 0 and b != 0:
+    x1, y1, x2, y2 = 1, 0, 0, 1
+    q, r = None, None
+    while r != 0:
         q = a // b
         r = a % b
 
-        rows.append((a, b, q, r, x0, y0, x1, y1))
+        rows.append((a, b, q, r, x1, y1, x2, y2))
 
         a, b = b, r
-        y0, y1 = y1, y0 - q * y1
-        x0, x1 = x1, x0 - q * x1
+        y1, y2 = y2, y1 - q * y2
+        x1, x2 = x2, x1 - q * x2
 
     row_length = 0
     for row in rows:
@@ -41,8 +42,11 @@ def print_pulverizer(a, b):
     print_table_header(row_length)
     for row in rows:
         print_table_row(*row, row_length)
+    print("")
 
-    return b, x0, y0
+    _, _, _, _, _, _, x2, y2 = rows[-1]
+
+    return b, x2, y2
 
 
 def pulverizer(a, b):

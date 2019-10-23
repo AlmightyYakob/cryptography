@@ -1,18 +1,21 @@
-from utils import pulverizer
+from utils import pulverizer, print_pulverizer
 from constants import A, B, MOD
 from typing import Tuple
 
 
-def add_points(p1: Tuple, p2: Tuple, q: int = MOD, a: int = A, b: int = B):
+def add_points(
+    p1: Tuple, p2: Tuple, q: int = MOD, a: int = A, b: int = B, print_out=False
+):
     x1, y1 = p1
     x2, y2 = p2
 
+    pulverizer_func = print_pulverizer if print_out else pulverizer
+
     if x1 != x2:
         # Case 1
-        if x2 - x1 > q:
-            _, inv_x2_x1, _ = pulverizer(x2 - x1, q)
-        else:
-            _, _, inv_x2_x1 = pulverizer(q, x2 - x1)
+        if print_out:
+            print("INVERSE OF", (x2 - x1) % q)
+        _, _, inv_x2_x1 = pulverizer_func(q, (x2 - x1) % q)
 
         m = (y2 - y1) * inv_x2_x1 % q
         c = y1 - m * x1 % q
@@ -23,14 +26,12 @@ def add_points(p1: Tuple, p2: Tuple, q: int = MOD, a: int = A, b: int = B):
         return (x3, q - y3)
     elif x1 == x2 and y1 != y2:
         # Case 2
-
         return (None, None)
     elif p1 == p2:
         # Case 3
-        if 2 * y1 > q:
-            _, inv_2y1, _ = pulverizer(2 * y1, q)
-        else:
-            _, _, inv_2y1 = pulverizer(q, 2 * y1)
+        if print_out:
+            print("INVERSE OF", (2 * y1) % q)
+        _, _, inv_2y1 = pulverizer_func(q, (2 * y1) % q)
 
         m = (3 * pow(x1, 2) + a) * inv_2y1 % q
 
@@ -43,19 +44,27 @@ def add_points(p1: Tuple, p2: Tuple, q: int = MOD, a: int = A, b: int = B):
         print("Nah fam")
 
 
-def subtract_points(p1: Tuple, p2: Tuple, q: int = MOD, a: int = A, b: int = B):
+def subtract_points(
+    p1: Tuple, p2: Tuple, q: int = MOD, a: int = A, b: int = B, print_out=False
+):
     x = p2[0]
     y = -1 * p2[1]
 
-    return add_points(p1, (x, y), q, a, b)
+    return add_points(p1, (x, y), q, a, b, print_out=print_out)
 
 
 def multiply_point(
-    p1: Tuple, n: int, q: int = MOD, a: int = A, b: int = B, print_out=False
+    p1: Tuple,
+    n: int,
+    q: int = MOD,
+    a: int = A,
+    b: int = B,
+    print_out=False,
+    print_tables=False,
 ):
     x, y = p1
     for i in range(n - 1):
-        x, y = add_points(p1, (x, y), q, a, b)
+        x, y = add_points(p1, (x, y), q, a, b, print_out=print_tables)
 
         if x is None and y is None:
             if print_out:
