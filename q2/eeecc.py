@@ -14,7 +14,8 @@ def add_points(
     if x1 != x2:
         # Case 1
         if print_out:
-            print("INVERSE OF", (x2 - x1) % q)
+            print(f"m = ({y2} - {y1})/({x2} - {x1}) % {q}")
+            print(f"INVERSE OF ({x2} - {x1} = {(x2 - x1) % q} (mod {q})):")
         _, _, inv_x2_x1 = pulverizer_func(q, (x2 - x1) % q)
 
         m = (y2 - y1) * inv_x2_x1 % q
@@ -23,6 +24,15 @@ def add_points(
         x3 = (pow(m, 2) - (x1 + x2)) % q
         y3 = (m * x3 + c) % q
 
+        if print_out:
+            print(f"m = {m}")
+            print(f"c = ({y1} - {m}*{x1}) % {q} = {c}")
+            print(f"x3 = ({m}^2 - {x1} + {x2}) % {q} = {x3}")
+            print(f"y3 = ({m}*{x3} + {c}) % {q} = {y3}")
+            print(f"Reflection y3 = q -  y3 = {q - y3}")
+            print(f"New Point: {(x3, q - y3)}")
+            print("")
+
         return (x3, q - y3)
     elif x1 == x2 and y1 != y2:
         # Case 2
@@ -30,13 +40,22 @@ def add_points(
     elif p1 == p2:
         # Case 3
         if print_out:
-            print("INVERSE OF", (2 * y1) % q)
+            print(f"m = (3 * {x1}^2 + {a})/(2*{y1}) % {q}")
+            print(f"INVERSE OF (2*{y1} = {2*y1 % q} (mod {q})):")
         _, _, inv_2y1 = pulverizer_func(q, (2 * y1) % q)
 
         m = (3 * pow(x1, 2) + a) * inv_2y1 % q
 
         x3 = (pow(m, 2) - 2 * x1) % q
         y3 = (y1 + m * (x3 - x1)) % q
+
+        if print_out:
+            print(f"m = {m}")
+            print(f"x3 = ({m}^2 - 2*{x1}) % {q} = {x3}")
+            print(f"y3 = ({y1} + {m}*({x3} - {x1})) % {q} = {y3}")
+            print(f"Reflection y3 = {q} - {y3} = {q - y3}")
+            print(f"New Point: {(x3, q - y3)}")
+            print("")
 
         return (x3, q - y3)
     else:
