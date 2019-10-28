@@ -1,5 +1,5 @@
-from utils import pulverizer, print_pulverizer
-from constants import A, B, MOD
+from .utils import pulverizer, print_pulverizer
+from .constants import A, B, MOD
 from typing import Tuple
 
 
@@ -97,6 +97,12 @@ def multiply_point(
         y = y % q
 
     return (x, y)
+
+
+def decrypt_message(cipher: Tuple, halfmask: Tuple, n: int, q: int = MOD):
+    multiplied = multiply_point(halfmask, n)
+    decrypted = subtract_points(cipher, multiplied)
+    return decrypted
 
 
 # def good_multiply_point(p1: Tuple, n: int, q: int, a: int, b: int):

@@ -1,4 +1,4 @@
-from constants import A, B, MOD
+from .constants import A, B, MOD
 from typing import Tuple
 
 
