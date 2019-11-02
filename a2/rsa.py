@@ -4,6 +4,11 @@ from random import randint
 def is_prime(n, rounds=100):
     """Determine if a number is prime using Miller-Rabin."""
     # represent n = (2^r)*d + 1
+    if n == 3 or n == 2:
+        return True
+    if n < 2:
+        raise Exception("Number too low")
+
     d = n - 1
     r = 0
 
@@ -24,7 +29,7 @@ def is_prime(n, rounds=100):
 
         return False
 
-    for _ in range(n):
+    for _ in range(rounds):
         a = randint(2, n - 2)
         x = pow(a, d, n)
 
@@ -41,12 +46,40 @@ def choose_e_d():
     pass
 
 
-def compute_n_phi():
-    pass
+def compute_n_phi(p, q):
+    n = p*q
+    phi = (p - 1) * (q - 1)
+    return n, phi
 
 
 def generate_p_q(k=4096):
-    pass
+    top = int("1" * k, 2)
+    bottom = int("1" + "0" * (k - 1), 2)
+
+    p = randint(bottom, top) | 1
+    q = randint(bottom, top) | 1
+    while p == q:
+        p = randint(bottom, top) | 1
+        q = randint(bottom, top) | 1
+
+    p_valid, q_valid = False, False
+    while not p_valid or not q_valid or p == q:
+        if not p_valid:
+            if is_prime(p) and p != q:
+                p_valid = True
+            else:
+                # p += 2
+                p = randint(bottom, top) | 1
+
+        if not q_valid:
+            if is_prime(q) and p != q:
+                q_valid = True
+            else:
+                # q += 2
+                q = randint(bottom, top) | 1
+
+        print(p_valid, q_valid)
+    return p, q
 
 
 def generate_keys():
