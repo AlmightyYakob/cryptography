@@ -6,10 +6,10 @@ from utils import pulverizer
 def is_prime(n, rounds=100):
     """Determine if a number is prime using Miller-Rabin."""
     # represent n = (2^r)*d + 1
-    if n == 3 or n == 2:
-        return True
     if n < 2:
         raise Exception("Number too low")
+    if n == 2 or n == 3:
+        return True
 
     d = n - 1
     r = 0
@@ -26,6 +26,8 @@ def is_prime(n, rounds=100):
         for _ in range(r - 1):
             x = pow(x, 2, n)
 
+            if x == 1:
+                return False
             if x == n - 1:
                 return True
 
@@ -35,10 +37,7 @@ def is_prime(n, rounds=100):
         a = randint(2, n - 2)
         x = pow(a, d, n)
 
-        if x == 1 or x == n - 1:
-            continue
-
-        if not subtest(x):
+        if x != 1 and x != n - 1 and not subtest(x):
             return False
 
     return True
@@ -126,7 +125,7 @@ def decrypt_message(cipher, keys=None):
     _, _, n, _, _, d = keys or read_keys()
 
     x = pow(cipher, d, n)
-    length = int(len(bin(x))/8)
+    length = int(len(bin(x)) / 8)
     print(x.to_bytes())
     msg = str(x.to_bytes(length, byteorder="big"), encoding="utf-8")
     return msg
