@@ -60,8 +60,8 @@ def compute_n_phi(p, q):
 
 
 def generate_p_q(k=1024):
-    top = int("1" * k, 2)
-    bottom = int("1" + "0" * (k - 1), 2)
+    top = pow(2, k) - 1
+    bottom = pow(2, k - 1)
 
     # Not sure which of these is faster/better
 
