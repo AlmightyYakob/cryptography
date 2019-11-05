@@ -1,3 +1,4 @@
+import binascii
 from random import randint
 
 from utils import pulverizer
@@ -116,28 +117,50 @@ def read_keys():
 def encrypt_message(msg, keys=None):
     _, _, n, _, e, _ = keys or read_keys()
 
-    num = int.from_bytes(msg.encode(), byteorder="big")
+    data = binascii.hexlify(msg.encode())
+    num = int(data, 16)
+
+    if num > n:
+        raise Exception("Message too large for public modulus (n)")
+
     return pow(num, e, n)
 
 
 def decrypt_message(cipher, keys=None):
-    # Semi-working
     _, _, n, _, _, d = keys or read_keys()
 
     x = pow(cipher, d, n)
-    length = int(len(bin(x)) / 8)
-    print(x.to_bytes())
-    msg = str(x.to_bytes(length, byteorder="big"), encoding="utf-8")
+    msg = binascii.unhexlify(hex(x)[2:])
+    msg = msg.decode("ascii")
     return msg
 
 
-def encrypt_file(path):
-    # Not working
+def encrypt_file(path, out, keys=None):
+    _, _, n, _, _, _ = keys or read_keys()
+    chunk_length = int(len(bin(n)) / 8) - 1
+    encrypted_chunks = []
+
     with open(path, "r") as inFile:
-        filestring = inFile.read()
+        while True:
+            chunk = inFile.read(chunk_length)
+            if not chunk:
+                break
 
-    return encrypt_message(filestring)
+            encrypted_chunks.append(str(encrypt_message(chunk)))
+
+    with open(out, "w") as outFile:
+        outFile.write("\n".join(encrypted_chunks))
 
 
-def decrypt_file():
-    pass
+def decrypt_file(path, keys=None):
+    _, _, n, _, _, _ = keys or read_keys()
+    # chunk_length = int(len(bin(n)) / 8) - 1
+
+    decrypted = ""
+    with open(path, "r") as inFile:
+        lines = inFile.readlines()
+
+    for line in lines:
+        decrypted += decrypt_message(int(line))
+
+    return decrypted
