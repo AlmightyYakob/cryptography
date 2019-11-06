@@ -15,5 +15,5 @@ for mask, cipher in point_pairs:
     # print(message[-1])
 
 # Dunno what to do with them at this point
-message = int("".join([str(x) for x in message]))
-# print(message)
+message = "".join([str(chr(x)) for x in message])
+print(message)
