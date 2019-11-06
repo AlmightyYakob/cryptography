@@ -130,31 +130,31 @@ def decrypt_message(cipher, keys=None):
     _, _, n, _, _, d = keys or read_keys()
 
     x = pow(cipher, d, n)
-    msg = binascii.unhexlify(hex(x)[2:])
-    msg = msg.decode("ascii")
+    hex_x = hex(x)[2:]
+    hex_x = f"0{hex_x}" if len(hex_x) == 1 else hex_x
+
+    msg = binascii.unhexlify(hex_x).decode()
     return msg
 
 
 def encrypt_file(path, out, keys=None):
+    # Done character by character
     _, _, n, _, _, _ = keys or read_keys()
-    chunk_length = int(len(bin(n)) / 8) - 1
-    encrypted_chunks = []
 
+    encrypted_chars = []
     with open(path, "r") as inFile:
-        while True:
-            chunk = inFile.read(chunk_length)
-            if not chunk:
-                break
+        data = inFile.read()
 
-            encrypted_chunks.append(str(encrypt_message(chunk)))
+    for char in data:
+        encrypted_chars.append(str(encrypt_message(char)))
 
     with open(out, "w") as outFile:
-        outFile.write("\n".join(encrypted_chunks))
+        outFile.write("\n".join(encrypted_chars))
 
 
 def decrypt_file(path, keys=None):
+    # Done character by character
     _, _, n, _, _, _ = keys or read_keys()
-    # chunk_length = int(len(bin(n)) / 8) - 1
 
     decrypted = ""
     with open(path, "r") as inFile:
