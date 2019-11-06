@@ -1,11 +1,21 @@
-from .utils import pulverizer, print_pulverizer
-from .constants import A, B, MOD
+from crypto.utils.pulverizer import pulverizer, print_pulverizer
+
 from typing import Tuple
 
 
-def add_points(
-    p1: Tuple, p2: Tuple, q: int = MOD, a: int = A, b: int = B, print_out=False
-):
+def on_curve(p1: Tuple, q: int, a: int, b: int):
+    x, y = p1
+
+    left_side = pow(y, 2, q)
+    right_side = (pow(x, 3) + a * x + b) % q
+
+    if left_side == right_side:
+        return True
+    else:
+        return False
+
+
+def add_points(p1: Tuple, p2: Tuple, q: int, a: int, b: int, print_out=False):
     x1, y1 = p1
     x2, y2 = p2
 
@@ -63,9 +73,7 @@ def add_points(
         print("Nah fam")
 
 
-def subtract_points(
-    p1: Tuple, p2: Tuple, q: int = MOD, a: int = A, b: int = B, print_out=False
-):
+def subtract_points(p1: Tuple, p2: Tuple, q: int, a: int, b: int, print_out=False):
     x = p2[0]
     y = -1 * p2[1]
 
@@ -73,13 +81,7 @@ def subtract_points(
 
 
 def multiply_point(
-    p1: Tuple,
-    n: int,
-    q: int = MOD,
-    a: int = A,
-    b: int = B,
-    print_out=False,
-    print_tables=False,
+    p1: Tuple, n: int, q: int, a: int, b: int, print_out=False, print_tables=False
 ):
     x, y = p1
     for i in range(n - 1):
@@ -99,9 +101,9 @@ def multiply_point(
     return (x, y)
 
 
-def decrypt_message(cipher: Tuple, halfmask: Tuple, n: int, q: int = MOD):
-    multiplied = multiply_point(halfmask, n)
-    decrypted = subtract_points(cipher, multiplied)
+def decrypt_message(cipher: Tuple, halfmask: Tuple, n: int, q: int, a: int, b: int):
+    multiplied = multiply_point(halfmask, n=n, q=q, a=a, b=b)
+    decrypted = subtract_points(cipher, multiplied, q=q, a=a, b=b)
     return decrypted
 
 

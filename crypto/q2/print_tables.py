@@ -1,4 +1,4 @@
-from eeecc import multiply_point, subtract_points, add_points
+from crypto.utils.eeecc import multiply_point, subtract_points, add_points
 
 print("4*H = H+H+H+H")
 multiply_point((32, 32), 4, print_tables=True)

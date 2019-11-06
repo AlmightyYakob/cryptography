@@ -1,7 +1,7 @@
 import binascii
 from random import randint
 
-from utils import pulverizer
+from crypto.utils.pulverizer import pulverizer
 
 
 def is_prime(n, rounds=100):

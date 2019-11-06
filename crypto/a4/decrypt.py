@@ -1,8 +1,5 @@
-import sys
 
-sys.path.append("..")  # Adds higher directory to python modules path.
-
-from q2.eeecc import decrypt_message
+from crypto.utils.eeecc import decrypt_message
 
 
 with open("a4.allkeys") as allkeys:

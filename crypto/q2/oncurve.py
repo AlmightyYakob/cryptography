@@ -1,6 +1,6 @@
 import sys
 
-from utils import on_curve
+from ..utils.eeecc import on_curve
 
 x = int(sys.argv[1])
 y = int(sys.argv[2])

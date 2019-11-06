@@ -1,4 +1,4 @@
-from utils import elgamel_decrypt
+from crypto.utils.elgamel import elgamel_decrypt
 from constants import A, B, G, P, Q
 
 
