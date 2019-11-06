@@ -9,8 +9,6 @@ with open("a4.allkeys") as allkeys:
     p, A, B, G, P, N = allkeys.readlines()
     p, A, B, N = int(p), int(A), int(B), int(N)
     G, P = tuple(G.split(" ")), tuple(P.split(" "))
-    # print(p, A, B, G, P, N)
-    # print(type(p), type(A), type(B), type(G), type(P), type(N))
 
 with open("a4.cipher") as cipherFile:
     point_pairs = cipherFile.readlines()
@@ -21,8 +19,9 @@ with open("a4.cipher") as cipherFile:
 
 message = []
 for cipher, mask in point_pairs:
-    message.append(decrypt_message(cipher, mask, N, p))
+    message.append(decrypt_message(cipher, mask, n=N, q=p, a=A, b=B))
     print(message[-1])
 
-message = int("".join([str(x) for (x, _) in message]))
-print(message)
+chars = [chr(x) for x, _ in message]
+string = "".join([str(c) for c in chars])
+print(string)
