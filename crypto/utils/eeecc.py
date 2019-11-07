@@ -1,4 +1,4 @@
-from pulverizer import pulverizer, print_pulverizer
+from crypto.utils.pulverizer import pulverizer, print_pulverizer
 
 from typing import Tuple
 
