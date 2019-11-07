@@ -1,8 +1,8 @@
 from crypto.utils.elgamel import elgamel_decrypt
-from constants import A, B, G, P, Q
+from constants import A, P, DIR_NAME
 
 
-with open("a3.cipher") as cipherFile:
+with open(f"{DIR_NAME}/a3.cipher") as cipherFile:
     point_pairs = cipherFile.readlines()
     point_pairs = [line.split(",") for line in point_pairs]
 

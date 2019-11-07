@@ -1,8 +1,5 @@
-PUBKEY_FILE = "a2.pubkeys"
-CIPHER_FILE = "a2.cipher"
-PHI_FILE = "a2.phi"
-
-ASCII_BIT_LENGTH = 8
+from crypto.utils.pulverizer import pulverizer
+from crypto.a2.constants import PUBKEY_FILE, CIPHER_FILE, PHI_FILE, ASCII_BIT_LENGTH
 
 
 def read_pubkey():
@@ -24,16 +21,6 @@ def read_phi():
         return int(phi_file.read().strip())
 
 
-def pulverizer(a, b):
-    """return (g, x, y) such that a*x + b*y = g = gcd(a, b)"""
-    x0, x1, y0, y1 = 0, 1, 1, 0
-    while a != 0:
-        q, b, a = b // a, a, b % a
-        y0, y1 = y1, y0 - q * y1
-        x0, x1 = x1, x0 - q * x1
-    return b, x0, y0
-
-
 def main():
     cipher_lines = read_cipher()
     N, e = read_pubkey()
@@ -50,7 +37,7 @@ def main():
     for i, line in enumerate(cipher_lines):
         binary_lines.append(bin(pow(line, d, N))[2:])
 
-    decoded = [""]*len(binary_lines)
+    decoded = [""] * len(binary_lines)
     for i, x in enumerate(binary_lines):
         len_mod = len(x) % ASCII_BIT_LENGTH
         x = ("0" * (ASCII_BIT_LENGTH - len_mod)) + binary_lines[i]
