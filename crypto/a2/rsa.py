@@ -1,7 +1,11 @@
 import binascii
+import click
 from random import randint
 
 from crypto.utils.pulverizer import pulverizer
+
+
+DEFAULT_K = 1024
 
 
 def is_prime(n, rounds=100):
@@ -63,24 +67,6 @@ def generate_p_q(k=1024):
     top = pow(2, k) - 1
     bottom = pow(2, k - 1)
 
-    # Not sure which of these is faster/better
-
-    # p, q = randint(bottom, top) | 1, randint(bottom, top) | 1
-    # p_done, q_done = False, False
-    # while not p_done or not q_done or p == q:
-    #     if not p_done:
-    #         p = randint(bottom, top) | 1
-    #         if is_prime(p) and p != q:
-    #             p_done = True
-
-    #     if not q_done:
-    #         q = randint(bottom, top) | 1
-    #         if is_prime(q) and p != q:
-    #             q_done = True
-
-    #     # print(p2, q)
-    # return p, q
-
     p, q = None, None
     while p is None or q is None or p == q:
         if p is None:
@@ -101,21 +87,25 @@ def generate_keys(k):
     n, phi = compute_n_phi(p, q)
     e, d = choose_e_d(phi)
 
-    keys = (p, q, n, phi, e, d)
-    with open("keys.txt", "w") as out:
+    keys = (p, q, n, e, d)
+    return keys
+
+
+def save_keys(keys, outfile):
+    with open(outfile, "w") as out:
         out.write("\n".join([str(x) for x in keys]))
 
 
-def read_keys():
-    with open("keys.txt", "r") as inFile:
+def read_keys(path):
+    with open(path, "r") as inFile:
         keys = inFile.readlines()
 
     keys = [int(x) for x in keys]
     return keys
 
 
-def encrypt_message(msg, keys=None):
-    _, _, n, _, e, _ = keys or read_keys()
+def encrypt_message(msg, keys):
+    _, _, n, e, _ = keys
 
     data = binascii.hexlify(msg.encode())
     num = int(data, 16)
@@ -126,8 +116,8 @@ def encrypt_message(msg, keys=None):
     return pow(num, e, n)
 
 
-def decrypt_message(cipher, keys=None):
-    _, _, n, _, _, d = keys or read_keys()
+def decrypt_message(cipher, keys):
+    _, _, n, _, d = keys
 
     x = pow(cipher, d, n)
     hex_x = hex(x)[2:]
@@ -137,30 +127,100 @@ def decrypt_message(cipher, keys=None):
     return msg
 
 
-def encrypt_file(path, out, keys=None):
+def encrypt_file(path, out, keys):
     # Done character by character
-    _, _, n, _, _, _ = keys or read_keys()
+    _, _, n, _, _ = keys
 
     encrypted_chars = []
     with open(path, "r") as inFile:
         data = inFile.read()
 
     for char in data:
-        encrypted_chars.append(str(encrypt_message(char)))
+        encrypted_chars.append(str(encrypt_message(char, keys)))
 
     with open(out, "w") as outFile:
         outFile.write("\n".join(encrypted_chars))
 
 
-def decrypt_file(path, keys=None):
+def decrypt_file(path, out, keys):
     # Done character by character
-    _, _, n, _, _, _ = keys or read_keys()
+    _, _, n, _, _ = keys
 
     decrypted = ""
     with open(path, "r") as inFile:
         lines = inFile.readlines()
 
     for line in lines:
-        decrypted += decrypt_message(int(line))
+        decrypted += decrypt_message(int(line), keys)
+
+    with open(out, "w") as outFile:
+        outFile.write(decrypted)
 
     return decrypted
+
+
+def out_option(func):
+    func = click.option(
+        "-o", "--out", required=True, help="The file to write the result to."
+    )(func)
+
+    return func
+
+
+@click.group()
+def cli():
+    pass
+
+
+@cli.command("generate")
+@out_option
+@click.option(
+    "-k",
+    "--key-length",
+    default=DEFAULT_K,
+    show_default=True,
+    help="The length in bits of the primes.",
+)
+def generate(out, key_length):
+    keys = generate_keys(key_length)
+    save_keys(keys, out)
+
+
+@cli.command("encrypt")
+@click.argument("filename")
+@out_option
+@click.option(
+    "-k",
+    "--keys",
+    "key_file",
+    help="The file containing the keys, "
+    "separated by newlines in the order p, q, n, e, d",
+)
+def encrypt(filename, out, key_file):
+    if not key_file:
+        keys = generate_keys(DEFAULT_K)
+    else:
+        keys = read_keys(keys)
+    encrypt_file(filename, out, keys=keys)
+
+    print("File encrypted using keys:", keys)
+
+
+@cli.command("decrypt")
+@click.argument("filename")
+@out_option
+@click.option(
+    "-k",
+    "--keys",
+    "key_file",
+    required=True,
+    help="The file containing the keys, "
+    "separated by newlines in the order p, q, n, e, d",
+)
+def decrypt(filename, out, key_file):
+    keys = read_keys(key_file)
+    decrypt_file(filename, out, keys)
+
+
+if __name__ == "__main__":
+    cli()
