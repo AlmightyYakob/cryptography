@@ -127,7 +127,7 @@ def decrypt_message(cipher, keys):
     return msg
 
 
-def encrypt_file(path, out, keys):
+def encrypt_file(path, keys):
     # Done character by character
     _, _, n, _, _ = keys
 
@@ -138,11 +138,13 @@ def encrypt_file(path, out, keys):
     for char in data:
         encrypted_chars.append(str(encrypt_message(char, keys)))
 
-    with open(out, "w") as outFile:
-        outFile.write("\n".join(encrypted_chars))
+    # with open(out, "w") as outFile:
+    #     outFile.write("\n".join(encrypted_chars))
+
+    return encrypted_chars
 
 
-def decrypt_file(path, out, keys):
+def decrypt_file(path, keys):
     # Done character by character
     _, _, n, _, _ = keys
 
@@ -153,16 +155,14 @@ def decrypt_file(path, out, keys):
     for line in lines:
         decrypted += decrypt_message(int(line), keys)
 
-    with open(out, "w") as outFile:
-        outFile.write(decrypted)
+    # with open(out, "w") as outFile:
+    #     outFile.write(decrypted)
 
     return decrypted
 
 
 def out_option(func):
-    func = click.option(
-        "-o", "--out", required=True, help="The file to write the result to."
-    )(func)
+    func = click.option("-o", "--out", help="The file to write the result to.")(func)
 
     return func
 
@@ -173,7 +173,7 @@ def cli():
 
 
 @cli.command("generate")
-@out_option
+@click.option("-o", "--out", required=True, help="The file to write the result to.")
 @click.option(
     "-k",
     "--key-length",
@@ -193,17 +193,21 @@ def generate(out, key_length):
     "-k",
     "--keys",
     "key_file",
+    required=True,
     help="The file containing the keys, "
     "separated by newlines in the order p, q, n, e, d",
 )
 def encrypt(filename, out, key_file):
-    if not key_file:
-        keys = generate_keys(DEFAULT_K)
-    else:
-        keys = read_keys(key_file)
-    encrypt_file(filename, out, keys=keys)
+    keys = read_keys(key_file)
 
-    print("File encrypted using keys:", keys)
+    char_list = encrypt_file(filename, keys=keys)
+    out_string = "\n".join(char_list)
+
+    if out:
+        with open(out, "w") as outFile:
+            outFile.write(out_string)
+    else:
+        print(out_string)
 
 
 @cli.command("decrypt")
@@ -219,7 +223,13 @@ def encrypt(filename, out, key_file):
 )
 def decrypt(filename, out, key_file):
     keys = read_keys(key_file)
-    decrypt_file(filename, out, keys)
+    decrypted_string = decrypt_file(filename, keys)
+
+    if out:
+        with open(out, "w") as outFile:
+            outFile.write(decrypted_string)
+    else:
+        print(decrypted_string)
 
 
 if __name__ == "__main__":
