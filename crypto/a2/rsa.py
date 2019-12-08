@@ -28,7 +28,7 @@ def is_prime(n, rounds=100):
         return False
 
     def subtest(x):
-        for _ in range(r - 1):
+        for _ in range(r):
             x = pow(x, 2, n)
 
             if x == 1:
